@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
 import SentimentDissatisfiedIcon from '@mui/icons-material/SentimentDissatisfied';
 import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral';
@@ -58,10 +58,15 @@ const StyledTextField = styled(TextField)(
 );
 
 export function FacesWithQualiFeedback(props) {
+    const fileListRef = useRef([])
     const [submitted, setSubmitted] = useState(false);
     const [inputText, setInputText] = useState(null);
     const [faceScore, setFaceScore] = useState(null);
-    const [fileList, setFileList] = useState([])
+    const [fileList, setFileList] = useState(fileListRef.current)
+
+    const uploadUrl = props.uploadUrl
+
+    console.log('uploadUrl', uploadUrl)
 
     useEffect(() => {
         if (props.disableWithScore) {
@@ -116,39 +121,97 @@ export function FacesWithQualiFeedback(props) {
 
     const handleSubmission = () => {
         setSubmitted(true);
-        props.submitFeedback(faceScore, inputText, fileList);
+        props.submitFeedback(faceScore, inputText, fileList.map(v => v.fileId).filter(v => !!v));
     };
 
-    const addFile = (e) => {
+    const addFile = async (e) => {
         console.log(e)
         const input = e.target
         console.log(input.files[0])
-        if (input.files[0]) {
-            setFileList([...fileList, input.files[0]])
+        const file = input.files[0]
+        if (file) {
+            const url = URL.createObjectURL(file)
+            fileListRef.current = [...fileListRef.current, { file, url, fileId: null }]
+            setFileList(fileListRef.current)
         }
-
         input.value = ''
+
+        try {
+            const id = await uploadFile(file)
+            finishUpload(id, file)
+        } catch (e) {
+            alert(e)
+            finishUpload(null, file)
+        }
     }
 
     const removeFile = (file) => {
-        setFileList(fileList.filter(v => v !== file))
+        fileListRef.current = fileListRef.current.filter(v => v.file !== file)
+        setFileList(fileListRef.current)
+    }
+
+    const uploadFile = async (file) => {
+
+        if (!uploadUrl) {
+            await new Promise((res) => setTimeout(() => {
+                res()
+            }, 3000))
+            return Math.random().toString()
+        }
+
+        const formData = new FormData()
+        formData.set('name', file.name)
+        formData.set('file', file)
+
+        const res = await fetch(uploadUrl, {
+            method: 'POST',
+            body: formData
+        })
+
+        const json = await res.json()
+
+        if (!json.fileId) throw new Error('Upload Error: fileId is blank!!!')
+
+        return json.fileId
+    }
+    const finishUpload = (id, file) => {
+        console.log({ id, file })
+        const list = fileListRef.current.map((item) => {
+            if (item.file === file) {
+                if (id) {
+                    return { ...item, fileId: id }
+                } else {
+                    return null
+                }
+            } else {
+                return item
+            }
+        })
+
+        fileListRef.current = list
+
+        setFileList(fileListRef.current)
     }
 
     if (props.maxTextLength != null) {
         return (
             <Box paddingY={0.5} height={180} component="form" sx={{ "& .MuiTextField-root": { m: 1, width: "50ch" } }} noValidate autoComplete="off">
                 <Stack direction="row" style={{ position: 'relative' }} spacing={1} justifyContent={props.align}>
-                    <div style={{ position: 'absolute', left: "8px", width: "178px", border: "0px solid #ccc", bottom: '8px', top: '32px' ,overflow:'auto'}}>
+                    <div style={{ position: 'absolute', left: "8px", width: "178px", border: "0px solid #ccc", bottom: '8px', top: '32px', overflow: 'auto' }}>
                         {
-                            fileList.map(file => <div style={{
+                            fileList.map(({ file, fileId, url }) => <div key={url} style={{
                                 fontSize: '14px',
                                 display: 'flex'
                             }}>
                                 <div style={{ flex: '1 1 0', textOverflow: "ellipsis", overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                                    <a download href={URL.createObjectURL(file)}>{file.name}</a>
+                                    {
+                                        fileId
+                                            ? <a download href={URL.createObjectURL(file)}>{file.name}</a>
+                                            : <span className="uploading">uploading....</span>
+                                    }
                                 </div>
                                 <div style={{ flex: '0 0 auto' }}>
-                                    <div style={{cursor:'pointer'}} onClick={() => removeFile(file)}>删除</div>
+                                    <div style={{ cursor: 'pointer' }} onClick={() => removeFile(file)}>删除</div>
                                 </div>
                             </div>)
                         }

@@ -5,7 +5,6 @@ import {
 import React from "react"
 import { Feedback } from "./feedback"
 
-
 class MyComponent extends StreamlitComponentBase {
 
   render() {
@@ -18,6 +17,7 @@ class MyComponent extends StreamlitComponentBase {
           disableWithScore={this.props.args["disable_with_score"]}
           align={this.props.args["align"]}
           default={this.props.args["default"]}
+          uploadUrl={this.props.args["upload_url"]}
         />
       </div>
     )

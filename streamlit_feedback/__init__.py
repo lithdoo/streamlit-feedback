@@ -32,6 +32,8 @@ def streamlit_feedback(
     kwargs={},
     align="flex-end",
     key=None,
+    # 文件上传接口 post ，参数为 { name, file } 的 FormData , 返回结果带 { fileId }
+    upload_url= None
 ):
     """Create a new instance of "streamlit_feedback".
 
@@ -109,6 +111,7 @@ def streamlit_feedback(
         align=align,
         key=key,
         default=None,
+        upload_url=upload_url
     )
 
     if st.session_state[f"feedback_submitted_{key}"] is True:
