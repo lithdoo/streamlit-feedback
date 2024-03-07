@@ -195,27 +195,9 @@ export function FacesWithQualiFeedback(props) {
 
     if (props.maxTextLength != null) {
         return (
-            <Box paddingY={0.5} height={180} component="form" sx={{ "& .MuiTextField-root": { m: 1, width: "50ch" } }} noValidate autoComplete="off">
+            <Box paddingY={0.5} height={240} component="form" sx={{ "& .MuiTextField-root": { m: 1, width: "50ch" } }} noValidate autoComplete="off">
                 <Stack direction="row" style={{ position: 'relative' }} spacing={1} justifyContent={props.align}>
-                    <div style={{ position: 'absolute', left: "8px", width: "178px", border: "0px solid #ccc", bottom: '8px', top: '32px', overflow: 'auto' }}>
-                        {
-                            fileList.map(({ file, fileId, url }) => <div key={url} style={{
-                                fontSize: '14px',
-                                display: 'flex'
-                            }}>
-                                <div style={{ flex: '1 1 0', textOverflow: "ellipsis", overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                                    {
-                                        fileId
-                                            ? <a download href={URL.createObjectURL(file)}>{file.name}</a>
-                                            : <span className="uploading">uploading....</span>
-                                    }
-                                </div>
-                                <div style={{ flex: '0 0 auto' }}>
-                                    <div style={{ cursor: 'pointer' }} onClick={() => removeFile(file)}>删除</div>
-                                </div>
-                            </div>)
-                        }
-                    </div>
+
                     <SentimentVeryDissatisfiedIcon
                         titleAccess="非常不满意"
                         sx={{
@@ -282,10 +264,29 @@ export function FacesWithQualiFeedback(props) {
                         submitted === false && faceScore !== null
                             ? <div>
                                 <StyledTextField id="outlined-multiline-static" inputProps={{ maxLength: props.maxTextLength }} onChange={handleTextInput} multiline rows={4} placeholder={props.optionalTextLabel} aria-label="Demo input" color={TextFieldcolors[faceScore]} />
-                                <Button style={{ marginLeft: '20px' }} sx={{ color: colors[faceScore] }} variant="text" size="small">
-                                    <label htmlFor="upload">上传文件</label>
-                                    <input id="upload" type="file" style={{ display: 'block', width: '0', height: '0' }} onChange={e => addFile(e)}></input>
-                                </Button>
+                                <div>
+                                    <Button style={{ marginLeft: '20px' }} sx={{ color: colors[faceScore] }} variant="text" size="small">
+                                        <label style={{marginBottom:'0'}} htmlFor="upload">上传文件</label>
+                                        <input id="upload" type="file" style={{ display: 'block', width: '0', height: '0' }} onChange={e => addFile(e)}></input>
+                                    </Button>
+                                </div>
+                                <div style={{ overflow: 'auto' ,padding: '0 20px', height: '63px'}}>{
+                                    fileList.map(({ file, fileId, url }) => <div key={url} style={{
+                                        fontSize: '14px',
+                                        display: 'flex'
+                                    }}>
+                                        <div style={{ flex: '1 1 0', textOverflow: "ellipsis", overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                            {
+                                                fileId
+                                                    ? <a download href={URL.createObjectURL(file)}>{file.name}</a>
+                                                    : <span className="uploading">uploading....</span>
+                                            }
+                                        </div>
+                                        <div style={{ flex: '0 0 auto' }}>
+                                            <div style={{ cursor: 'pointer' }} onClick={() => removeFile(file)}>删除</div>
+                                        </div>
+                                    </div>)
+                                }</div>
                             </div>
                             : null
                     }
