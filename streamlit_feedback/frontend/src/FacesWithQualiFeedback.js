@@ -7,7 +7,7 @@ import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt
 import InputBase from '@mui/material/InputBase';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import { Box } from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
 
 import { styled } from '@mui/material/styles';
 import TextField from "@mui/material/TextField";
@@ -174,6 +174,7 @@ export function FacesWithQualiFeedback(props) {
 
         return json.fileId
     }
+
     const finishUpload = (id, file) => {
         console.log({ id, file })
         const list = fileListRef.current.map((item) => {
@@ -197,68 +198,73 @@ export function FacesWithQualiFeedback(props) {
         return (
             <Box paddingY={0.5} height={240} component="form" sx={{ "& .MuiTextField-root": { m: 1, width: "50ch" } }} noValidate autoComplete="off">
                 <Stack direction="row" style={{ position: 'relative' }} spacing={1} justifyContent={props.align}>
+                    <Tooltip title="非常不满意">
+                        <SentimentVeryDissatisfiedIcon
+                            sx={{
+                                fontSize: 28,
+                                color: selectColor("😞"),
+                                '&:hover': {
+                                    cursor: submitted ? null : "pointer",
+                                    color: selectHoverColor("😞"),
+                                },
+                            }}
+                            onClick={() => submitted ? {} : handleFaceClick("😞")}
+                        />
+                    </Tooltip>
+                    <Tooltip title="不满意">
+                        <SentimentDissatisfiedIcon
+                            sx={{
+                                fontSize: 28,
+                                color: selectColor("🙁"),
+                                '&:hover': {
+                                    cursor: submitted ? null : "pointer",
+                                    color: selectHoverColor("🙁"),
+                                },
+                            }}
+                            onClick={() => submitted ? {} : handleFaceClick("🙁")}
+                        />
+                    </Tooltip>
+                    <Tooltip title="一般">
+                        <SentimentNeutralIcon
+                            sx={{
+                                fontSize: 28,
+                                color: selectColor("😐"),
+                                '&:hover': {
+                                    cursor: submitted ? null : "pointer",
+                                    color: selectHoverColor("😐"),
+                                },
+                            }}
+                            onClick={() => submitted ? {} : handleFaceClick("😐")}
+                        />
+                    </Tooltip>
 
-                    <SentimentVeryDissatisfiedIcon
-                        titleAccess="非常不满意"
-                        sx={{
-                            fontSize: 28,
-                            color: selectColor("😞"),
-                            '&:hover': {
-                                cursor: submitted ? null : "pointer",
-                                color: selectHoverColor("😞"),
-                            },
-                        }}
-                        onClick={() => submitted ? {} : handleFaceClick("😞")}
-                    />
-                    <SentimentDissatisfiedIcon
-                        titleAccess="不满意"
-                        sx={{
-                            fontSize: 28,
-                            color: selectColor("🙁"),
-                            '&:hover': {
-                                cursor: submitted ? null : "pointer",
-                                color: selectHoverColor("🙁"),
-                            },
-                        }}
-                        onClick={() => submitted ? {} : handleFaceClick("🙁")}
-                    />
-                    <SentimentNeutralIcon
-                        titleAccess="一般"
-                        sx={{
-                            fontSize: 28,
-                            color: selectColor("😐"),
-                            '&:hover': {
-                                cursor: submitted ? null : "pointer",
-                                color: selectHoverColor("😐"),
-                            },
-                        }}
-                        onClick={() => submitted ? {} : handleFaceClick("😐")}
-                    />
-                    <SentimentSatisfiedIcon
-                        titleAccess="满意"
-                        sx={{
-                            fontSize: 28,
-                            color: selectColor("🙂"),
-                            '&:hover': {
-                                cursor: submitted ? null : "pointer",
-                                color: selectHoverColor("🙂"),
-                            },
-                        }}
-                        onClick={() => submitted ? {} : handleFaceClick("🙂")}
-                    />
-                    <SentimentSatisfiedAltIcon
-                        titleAccess="非常满意"
-                        sx={{
-                            fontSize: 28,
-                            color: selectColor("😀"),
-                            '&:hover': {
-                                cursor: submitted ? null : "pointer",
-                                color: selectHoverColor("😀"),
-                            },
-                        }}
-                        onClick={() => submitted ? {} : handleFaceClick("😀")}
-                    />
+                    <Tooltip title="满意">
+                        <SentimentSatisfiedIcon
+                            sx={{
+                                fontSize: 28,
+                                color: selectColor("🙂"),
+                                '&:hover': {
+                                    cursor: submitted ? null : "pointer",
+                                    color: selectHoverColor("🙂"),
+                                },
+                            }}
+                            onClick={() => submitted ? {} : handleFaceClick("🙂")}
+                        />
+                    </Tooltip>
 
+                    <Tooltip title="非常满意">
+                        <SentimentSatisfiedAltIcon
+                            sx={{
+                                fontSize: 28,
+                                color: selectColor("😀"),
+                                '&:hover': {
+                                    cursor: submitted ? null : "pointer",
+                                    color: selectHoverColor("😀"),
+                                },
+                            }}
+                            onClick={() => submitted ? {} : handleFaceClick("😀")}
+                        />
+                    </Tooltip>
 
                     {
                         submitted === false && faceScore !== null
@@ -266,11 +272,11 @@ export function FacesWithQualiFeedback(props) {
                                 <StyledTextField id="outlined-multiline-static" inputProps={{ maxLength: props.maxTextLength }} onChange={handleTextInput} multiline rows={4} placeholder={props.optionalTextLabel} aria-label="Demo input" color={TextFieldcolors[faceScore]} />
                                 <div>
                                     <Button style={{ marginLeft: '20px' }} sx={{ color: colors[faceScore] }} variant="text" size="small">
-                                        <label style={{marginBottom:'0'}} htmlFor="upload">上传文件</label>
+                                        <label style={{ marginBottom: '0' }} htmlFor="upload">上传文件</label>
                                         <input id="upload" type="file" style={{ display: 'block', width: '0', height: '0' }} onChange={e => addFile(e)}></input>
                                     </Button>
                                 </div>
-                                <div style={{ overflow: 'auto' ,padding: '0 20px', height: '63px'}}>{
+                                <div style={{ overflow: 'auto', padding: '0 20px', height: '63px' }}>{
                                     fileList.map(({ file, fileId, url }) => <div key={url} style={{
                                         fontSize: '14px',
                                         display: 'flex'
